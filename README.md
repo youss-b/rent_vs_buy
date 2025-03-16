@@ -84,6 +84,8 @@ This model assumes that you pay your mortgage, insurance, and property taxes mon
 
 The same is true, but more substantially, of maintenance expenses. This model assumes you pay a certain amount monthly to maintain your house. In reality, you might pay nothing for five years and then replace the roof for \$20k. That's a meaningfully different financial outcome. However, because "maintenance" is a category that implies "unforeseen expenses", it's hard to predict and highly variable. I think modeling it as a monthly expense/savings is accurate enough for our purposes. Even if you pay nothing for five years and then replace the roof, it's possible the expense is so unexpected you have to take out a loan and pay interest on that loan, which could end up nullifying the benefit of having invested the extra money for five years and seen it grow. Treating this as a monthly expense is a way of simplifying all that.
 
+## Utilities
+Might be included in the future (specifically, the difference in utility cost once you move to purchasing).
 
 # A Note On Marginal income tax rates
 The marginal income tax rate is used to estimate how much you save on taxes by spending money on mortgage interest, since that expense is uniquely deductible. This can have a substantial (beneficial) impact on the cost of homeownership, particularly in the early years. 
