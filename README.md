@@ -35,6 +35,13 @@ The benefit of this is you get dotted lines on your graphs that represent the ou
 
 Just to point you in the right direction if you're lost: once you've added variance to these four parameters, the initial purchase price of the house and the cost of your rent become really important knobs.
 
+## Examples
+
+This is what example output might look like:
+
+![Example Graph 1](images/graph_1.png)
+![Example Graph 2](images/graph_2.png)
+
 # Not Modeled
 
 These are factors I intentionally did not model, but could potentially have an impact on your decisions. It's worth reading through this just to know what's missing from this picture and why. I tried to order these according to what I'd assume to have the greatest impact on the predictions.
