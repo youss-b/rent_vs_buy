@@ -10,11 +10,25 @@ python rent_vs_buy_model.py
 
 # How to Interpret
 
+## Example Output
+
+```
+Your down payment will be $100000.0
+Your monthly mortgage payment, excluding insurance and taxes, will be $2554.64
+You break even in 10 out of 11 simulations. When you break even it takes on average 7.28 years.
+Breaking even could take as little as 3.92 years or as long as 14.67 years.
+The average ending present value benefit of owning over renting is $109660.81
+```
+
+![Example Graph 1](images/graph_1.png)
+![Example Graph 2](images/graph_2.png)
+
 ## Printed Statements
-You get three printed statements:
+You get a few printed statements:
 - How much your down payment will be, according to your down payment percentage and the purchase cost.
 - How much your fixed monthly mortgage payment will be (only interest and principal, excluding insurance, property taxes, HOA, PMI, etc, which all vary over time)
 - How many years it takes to break even, if ever. "Breaking even" means the value of ownership finally exceeds the value of renting. If you run additional simulations, you will get the average, minimum, and maximum breakeven times.
+- How much the average present-value benefit is of owning over renting at the end of the mortgage term.
 
 ## Graph 1: Owning Vs Renting Values Over Time
 This graph compares the dollar values of owning vs renting over each month period of the mortage term. So for any given month, I compare the net proceeds you get from selling the house *in that month* to the investment value of your down payment had you not bought the house and continued renting instead. Some important things to note:
@@ -34,13 +48,6 @@ If your NUM_ADDITIONAL_SIMULATIONS parameter is non-zero, you get to play around
 The benefit of this is you get dotted lines on your graphs that represent the outcomes of additional simulations had you chosen slightly different values for each of those four parameters. This allows you to see the "spread" over time, and get a sense of how variable your outcomes can be as a result of factors that are entirely outside of your control (those four parameters were selected on the basis of being unpredictable and uncontrollable). I encourage you to play around with this. At first it might be discouraging to see how variable the outcomes can be, maybe prompting you to think, "Well, this whole exercise is useless." However, once you've seen highly variable outcomes, go back to your known parameters and play around with those (like the cost of rent or your home purchase price), and you might see that even with high variance, some scenarios are still very clearly "you should buy" or "you should rent." This feature should give you an intuitive sense of how sensitive a particular situation is to macro-economic circumstances. If you clearly benefit from one scenario despite a high variance, you're pretty immune to economic circumstances (i.e. "recession-proof"). But if you keep generating models that are all over the place, then that means your individual circumstances are such that your financial outcome will depend heavily on how well the home and stock markets perform over the next decades. How comfortable you are with that variance is up to you.
 
 Just to point you in the right direction if you're lost: once you've added variance to these four parameters, the initial purchase price of the house and the cost of your rent become really important knobs.
-
-## Examples
-
-This is what example output might look like:
-
-![Example Graph 1](images/graph_1.png)
-![Example Graph 2](images/graph_2.png)
 
 # Not Modeled
 
