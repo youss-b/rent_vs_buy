@@ -237,21 +237,23 @@ else:
 
 print("The average ending present value benefit of owning over renting is ${}".format(round(np.average([x[-1] for x in present_value_benefits]), 2)))
 
+years = np.arange(0, YEARS_OF_MORTGAGE, 1/12)
+
 _, ax1 = plt.subplots()
-ax1.set(xlabel="Month", ylabel="Value")
-plt.plot(net_cashes[0], label="home proceeds if sold")
-plt.plot(equities_while_renting[0], label="investments while renting")
+ax1.set(xlabel="Year", ylabel="Value")
+plt.plot(years, net_cashes[0], label="home proceeds if sold")
+plt.plot(years, equities_while_renting[0][1:], label="investments while renting")
 plt.legend()
 plt.title("Owning vs Renting Values Over Time")
 for i in range(1, len(net_cashes)):
-    plt.plot(net_cashes[i], ':', alpha=0.2, color='blue')
-    plt.plot(equities_while_renting[i], ':', alpha=0.5, color='orange')
+    plt.plot(years, net_cashes[i], ':', alpha=0.2, color='blue')
+    plt.plot(years, equities_while_renting[i][1:], ':', alpha=0.5, color='orange')
 
 _, ax2 = plt.subplots()
-ax2.set(xlabel="Month", ylabel="Value")
-plt.plot(present_value_benefits[0])
+ax2.set(xlabel="Year", ylabel="Value")
+plt.plot(years, present_value_benefits[0])
 plt.title("Present Value Benefit Difference: Owning Minus Renting")
 for i in range(1, len(present_value_benefits)):
-    plt.plot(present_value_benefits[i], ':', alpha=0.5, color='blue')
-plt.plot([0] * len(present_value_benefits[0]), '--')
+    plt.plot(years, present_value_benefits[i], ':', alpha=0.5, color='blue')
+plt.plot([0] * np.arange(0, YEARS_OF_MORTGAGE), '--')
 plt.show()
