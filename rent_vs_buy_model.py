@@ -13,6 +13,8 @@ import numpy as np
 PURCHASE_PRICE = 500000
 
 # What percent of the purchase price are you willing to put down?
+# If you are receiving a gift for your down payment, put only the percentage you are solely contributing here.
+# There's a different parameter, GIFT, to represent how much money you'll receive as a gift towards your down payment.
 DOWN_PAYMENT_PERCENTAGE = 20
 
 # What interest rate did you qualify for? A percentage value, i.e. "6.6" is "a 6.6% interest rate".
@@ -46,6 +48,10 @@ PMI_RATE = 1.5
 # It's assumed to increase once per year at the rate of assumed general inflation.
 # This is the current monthly HOA fee, in dollars.
 HOA_FEES = 0
+
+# If you are receiving a gift to contribute to your down payment, add how much
+# you are receiving here, in dollars.
+GIFT = 0
 # ******************** END KNOWN PARAMETERS ********************************** #
 
 # ******************** ASSUMED PARAMETERS ********************************** #
@@ -120,10 +126,11 @@ num_periodic_payments = YEARS_OF_MORTGAGE * 12
 periodic_interest_rate = INTEREST_RATE / 100 / 12
 discount_factor_helper = math.pow((1+periodic_interest_rate), num_periodic_payments)
 discount_factor = (discount_factor_helper - 1) / (periodic_interest_rate * discount_factor_helper)
-down_payment = PURCHASE_PRICE * DOWN_PAYMENT_PERCENTAGE / 100
+down_payment = PURCHASE_PRICE * DOWN_PAYMENT_PERCENTAGE / 100 + GIFT
 mortgage_payment = round((PURCHASE_PRICE - down_payment) / discount_factor, 2)
 
 print("Your down payment will be ${}".format(down_payment))
+if GIFT != 0: print("Since you had a gift, your portion of the down payment will only be ${}".format(down_payment - GIFT))
 print("Your monthly mortgage payment, excluding insurance and taxes, will be ${}".format(mortgage_payment))
 
 # ******************** CODE THAT BUILDS AND RUNS THE MODEL ********************************** #
@@ -151,11 +158,11 @@ def simulate(assumed_annual_apprecation, after_tax_investment_return, inflation,
     net_cash = []
     rent = [RENT]
     cash_outflow = []
-    equity_while_renting = [down_payment]
+    equity_while_renting = [down_payment - GIFT]
     breakeven = False
     breakeven_period = None
     pmi = [0]
-    pmi_ended = (DOWN_PAYMENT_PERCENTAGE >= 20)
+    pmi_ended = (debt[-1] / home_values[-1]) <= 0.8
     hoa = [HOA_FEES]
     present_value_benefit = []
     
@@ -190,7 +197,7 @@ def simulate(assumed_annual_apprecation, after_tax_investment_return, inflation,
     
         cash_outflow.append(interest_on_debt[-1]+fixed_costs['insurance'][-1] + fixed_costs['maintenance'][-1] + fixed_costs['property_tax'][-1] + pmi[-1] +hoa[-1] - income_tax_savings[-1])
         net_cash.append(home_values[-1] - transaction_cost[-1] - debt[-1])
-        equity_while_renting.append((equity_while_renting[-1]+cash_outflow[-1]-rent[-1])*(1+after_tax_investment_return/12/100))
+        equity_while_renting.append((equity_while_renting[-1])*(1+after_tax_investment_return/12/100)+cash_outflow[-1]-rent[-1])
         present_value_benefit.append((net_cash[-1] - equity_while_renting[-1])/math.pow(1+inflation/100/12, month))
     
         if not breakeven and net_cash[-1] > equity_while_renting[-1]:
