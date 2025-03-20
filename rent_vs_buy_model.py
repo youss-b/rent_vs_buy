@@ -10,12 +10,12 @@ import numpy as np
 # will come from the assumed parameters in the section below.
 
 # How much is the house you're looking to buy, in dollars?
-PURCHASE_PRICE = 500000
+PURCHASE_PRICE = 250000
 
 # What percent of the purchase price are you willing to put down?
 # If you are receiving a gift for your down payment, put only the percentage you are solely contributing here.
 # There's a different parameter, GIFT, to represent how much money you'll receive as a gift towards your down payment.
-DOWN_PAYMENT_PERCENTAGE = 20
+DOWN_PAYMENT_PERCENTAGE = 10
 
 # What interest rate did you qualify for? A percentage value, i.e. "6.6" is "a 6.6% interest rate".
 INTEREST_RATE = 6.6
@@ -31,10 +31,10 @@ HOME_INSURANCE = 1000
 # NOTE: This will model as growing only once every 12 months. The percentage remains the same, but as the home's value grows,
 # naturally the payment will grow as well. In most places, tax-assessed value correlates strongly with home value, but
 # this could be very different if you live in California.
-PROPERTY_TAX_RATE = 1.5
+PROPERTY_TAX_RATE = 1
 
 # In dollars, how much do you currently pay in rent, or how much would you pay in rent if you don't live in this prospective home?
-RENT = 2400
+RENT = 1750
 
 # This is the Private Mortgage Insurance rate you qualify for, as a percentage of the debt.
 # This is only applied if your down payment is below 20%. It will add an insurance cost to your monthly payment
@@ -165,6 +165,7 @@ def simulate(assumed_annual_apprecation, after_tax_investment_return, inflation,
     pmi_ended = (debt[-1] / home_values[-1]) <= 0.8
     hoa = [HOA_FEES]
     present_value_benefit = []
+    home_investment_surplus = [0]
     
     for month in range(0, num_periodic_payments):
         home_values.append(home_values[-1]*appreciation_per_period)
@@ -195,9 +196,12 @@ def simulate(assumed_annual_apprecation, after_tax_investment_return, inflation,
             else:
                 pmi.append(PMI_RATE/100/12 * debt[-1])
     
-        cash_outflow.append(interest_on_debt[-1]+fixed_costs['insurance'][-1] + fixed_costs['maintenance'][-1] + fixed_costs['property_tax'][-1] + pmi[-1] +hoa[-1] - income_tax_savings[-1])
-        net_cash.append(home_values[-1] - transaction_cost[-1] - debt[-1])
-        equity_while_renting.append((equity_while_renting[-1])*(1+after_tax_investment_return/12/100)+cash_outflow[-1]-rent[-1])
+        cash_outflow_in_month = interest_on_debt[-1] + fixed_costs['maintenance'][-1] + fixed_costs['insurance'][-1] + fixed_costs['property_tax'][-1] + pmi[-1] + hoa[-1] - income_tax_savings[-1]
+        cash_outflow.append(cash_outflow_in_month)
+        cash_outflow_vs_rent = cash_outflow_in_month - rent[-1]
+        home_investment_surplus.append(home_investment_surplus[-1]*(1+after_tax_investment_return/12/100)-min(0, cash_outflow_vs_rent))
+        net_cash.append(home_values[-1] - transaction_cost[-1] - debt[-1] + home_investment_surplus[-1])
+        equity_while_renting.append((equity_while_renting[-1])*(1+after_tax_investment_return/12/100)+max(0, cash_outflow_vs_rent))
         present_value_benefit.append((net_cash[-1] - equity_while_renting[-1])/math.pow(1+inflation/100/12, month))
     
         if not breakeven and net_cash[-1] > equity_while_renting[-1]:
@@ -255,6 +259,7 @@ plt.title("Owning vs Renting Values Over Time")
 for i in range(1, len(net_cashes)):
     plt.plot(years, net_cashes[i], ':', alpha=0.2, color='blue')
     plt.plot(years, equities_while_renting[i][1:], ':', alpha=0.5, color='orange')
+plt.savefig('output/graph_1.png')
 
 _, ax2 = plt.subplots()
 ax2.set(xlabel="Year", ylabel="Value")
@@ -263,4 +268,4 @@ plt.title("Present Value Benefit Difference: Owning Minus Renting")
 for i in range(1, len(present_value_benefits)):
     plt.plot(years, present_value_benefits[i], ':', alpha=0.5, color='blue')
 plt.plot([0] * np.arange(0, YEARS_OF_MORTGAGE), '--')
-plt.show()
+plt.savefig('output/graph_2.png')
