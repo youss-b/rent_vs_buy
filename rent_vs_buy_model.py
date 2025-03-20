@@ -10,12 +10,12 @@ import numpy as np
 # will come from the assumed parameters in the section below.
 
 # How much is the house you're looking to buy, in dollars?
-PURCHASE_PRICE = 250000
+PURCHASE_PRICE = 765700
 
 # What percent of the purchase price are you willing to put down?
 # If you are receiving a gift for your down payment, put only the percentage you are solely contributing here.
 # There's a different parameter, GIFT, to represent how much money you'll receive as a gift towards your down payment.
-DOWN_PAYMENT_PERCENTAGE = 10
+DOWN_PAYMENT_PERCENTAGE = 20
 
 # What interest rate did you qualify for? A percentage value, i.e. "6.6" is "a 6.6% interest rate".
 INTEREST_RATE = 6.6
@@ -34,7 +34,7 @@ HOME_INSURANCE = 1000
 PROPERTY_TAX_RATE = 1
 
 # In dollars, how much do you currently pay in rent, or how much would you pay in rent if you don't live in this prospective home?
-RENT = 1750
+RENT = 2700
 
 # This is the Private Mortgage Insurance rate you qualify for, as a percentage of the debt.
 # This is only applied if your down payment is below 20%. It will add an insurance cost to your monthly payment
@@ -52,6 +52,12 @@ HOA_FEES = 0
 # If you are receiving a gift to contribute to your down payment, add how much
 # you are receiving here, in dollars.
 GIFT = 0
+
+# California? If true, tax-assessed value will increase at the maximum California value
+# of 2% per year or the ASSUMED_ANNUAL_APPRECIATION, whichever is lower.
+# If not in California, tax-assessed value will match whatever the home value is throughout
+# the period.
+IN_CALIFORNIA = True
 # ******************** END KNOWN PARAMETERS ********************************** #
 
 # ******************** ASSUMED PARAMETERS ********************************** #
@@ -143,11 +149,12 @@ def simulate(assumed_annual_apprecation, after_tax_investment_return, inflation,
     appreciation_per_period = 1+assumed_annual_apprecation/100 / 12
     home_values = [PURCHASE_PRICE]
     debt = [PURCHASE_PRICE - down_payment]
+    tax_assessed_value = [PURCHASE_PRICE]
     equity_in_home = [down_payment]
     
     fixed_costs = {}
     fixed_costs['insurance'] = [HOME_INSURANCE/12]
-    fixed_costs['property_tax'] = [PROPERTY_TAX_RATE/100/12*PURCHASE_PRICE]
+    fixed_costs['property_tax'] = [PROPERTY_TAX_RATE/100/12*tax_assessed_value[-1]]
     fixed_costs['maintenance'] = []
     
     income_tax_savings = []
@@ -178,7 +185,8 @@ def simulate(assumed_annual_apprecation, after_tax_investment_return, inflation,
     
         if (month % 12) == 0 and month != 0:
             fixed_costs['insurance'].append(fixed_costs['insurance'][-1] * (1+inflation/100))
-            fixed_costs['property_tax'].append(PROPERTY_TAX_RATE/100/12*home_values[-1])
+            tax_assessed_value.append(home_values[-1] if not IN_CALIFORNIA else (tax_assessed_value[-1]*(1+max(2,ASSUMED_ANNUAL_APPRECATION)/100)))
+            fixed_costs['property_tax'].append(PROPERTY_TAX_RATE/100/12*tax_assessed_value[-1])
             rent.append(rent[-1]*(1+rental_inflation/100))
             hoa.append(hoa[-1]*(1+inflation/100))
         elif month != 0:
